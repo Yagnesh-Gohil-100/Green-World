@@ -40,9 +40,11 @@ const SignUp = () => {
         if (!validate()) return;
         setLoading(true);
         try {
-            await axios.post("/api/signup", {
+            console.log(formData);
+
+            await axios.post("http://localhost:5000/api/auth/signup", {
                 ...formData,
-                type: activeTab,
+                userType: activeTab,
             });
             alert("Signup successful!");
             setFormData({ name: "", email: "", password: "" });
