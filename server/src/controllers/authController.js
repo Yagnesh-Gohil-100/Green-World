@@ -299,14 +299,14 @@ exports.login = async (req, res, next) => {
       });
     }
 
-    // Check verification status
-    if (!user.isVerified) {
-      return res.status(401).json({
-        success: false,
-        error: 'Please verify your email before logging in',
-        requiresVerification: true
-      });
-    }
+    // // Check verification status
+    // if (!user.isVerified) {
+    //   return res.status(401).json({
+    //     success: false,
+    //     error: 'Please verify your email before logging in',
+    //     requiresVerification: true
+    //   });
+    // }
 
     sendTokenResponse(user, userType, 200, res);
 
