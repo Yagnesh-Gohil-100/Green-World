@@ -1,0 +1,110 @@
+/* NavBar.css */
+.eco-navbar {
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 20px rgba(46, 125, 50, 0.1);
+  padding: 0.5rem 1rem;
+}
+
+.navbar-brand {
+  font-size: 1.5rem;
+  color: #2e7d32 !important;
+  transition: transform 0.3s ease;
+}
+
+.navbar-brand:hover {
+  transform: scale(1.05);
+  color: #2e7d32 !important;
+}
+
+.nav-link {
+  color: #2c3e50 !important;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  padding: 0.5rem 1rem !important;
+  border-radius: 8px;
+  margin: 0 0.1rem;
+}
+
+.nav-link:hover {
+  color: #2e7d32 !important;
+  background: rgba(46, 125, 50, 0.1);
+}
+
+.nav-icon {
+  font-size: 1rem;
+  transition: transform 0.3s ease;
+}
+
+.nav-link:hover .nav-icon {
+  transform: scale(1.1);
+}
+
+/* Dropdown styles */
+.dropdown-menu {
+  border: none;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  padding: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.dropdown-item {
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  transition: all 0.2s ease;
+  color: #2c3e50;
+}
+
+.dropdown-item:hover {
+  background: rgba(46, 125, 50, 0.1);
+  color: #2e7d32;
+}
+
+.dropdown-item-text {
+  padding: 0.5rem 1rem;
+  color: #6c757d;
+}
+
+/* Sign Up button */
+.btn-signup {
+  background: linear-gradient(135deg, #388e3c, #66bb6a) !important;
+  border: none;
+  color: white !important;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.btn-signup:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(56, 142, 60, 0.3);
+  color: white !important;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 991.98px) {
+  .navbar-nav {
+    padding: 1rem 0;
+  }
+  
+  .nav-link {
+    margin: 0.2rem 0;
+  }
+  
+  .dropdown-menu {
+    border: none;
+    box-shadow: none;
+    margin-top: 0;
+  }
+  
+  .btn-signup {
+    margin: 0.5rem 0;
+  }
+}
+
+/* Active state for current page */
+.nav-link.active {
+  background: rgba(46, 125, 50, 0.15) !important;
+  color: #2e7d32 !important;
+  font-weight: 600;
+}

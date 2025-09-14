@@ -1,90 +1,136 @@
 import React from "react";
-
+import { Link, useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
+import {
+  FaSeedling,
+  FaHome,
+  FaChartLine,
+  FaUsers,
+  FaSignInAlt,
+  FaUserPlus,
+  FaUserCircle,
+  FaInfoCircle,
+  FaCog,
+  FaLeaf,
+  FaSignOutAlt,
+} from "react-icons/fa";
+import { useAuth } from "../../contexts/AuthContext";
+import { Navbar, Nav, Container, Dropdown } from "react-bootstrap";
+import "./NavBar.css";
 
-import { FaSeedling, FaHome, FaChartLine, FaUsers, FaSignInAlt, FaUserPlus } from "react-icons/fa";
+const NavBar = () => {
+  const { currentUser, userType, logout } = useAuth();
+  const navigate = useNavigate();
 
-const Navbar = () => {
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
 
- return (
+  const formatUserType = (type) => {
+    const typeMap = {
+      personal: "Personal User",
+      business: "Business Admin",
+      employee: "Business Employee",
+    };
+    return typeMap[type] || type;
+  };
 
-   <nav className="navbar navbar-expand-lg glass-navbar sticky-top px-2">
+  return (
+    <Navbar expand="lg" bg="light" variant="light" sticky="top" className="eco-navbar shadow-sm">
+      <Container fluid>
+        {/* Brand */}
+        {currentUser ? (<Navbar.Brand as={Link} to="/home" className="fw-bold d-flex align-items-center">
+          <FaSeedling size={28} className="me-2 text-success" />
+          EcoTrackify
+        </Navbar.Brand>): (
+          <Navbar.Brand as={Link} to="/" className="fw-bold d-flex align-items-center">
+          <FaSeedling size={28} className="me-2 text-success" />
+          EcoTrackify
+        </Navbar.Brand>
+        )}
 
-     {/* Logo / Brand */}
+        <Navbar.Toggle aria-controls="main-navbar" />
+        <Navbar.Collapse id="main-navbar">
+          {/* Left side */}
+          <Nav className="me-auto">
+            {currentUser ? (
+              <>
+                <Nav.Link as={Link} to="/home" className="d-flex align-items-center gap-2">
+                  <FaHome /> Home
+                </Nav.Link>
 
-     <a className="navbar-brand fw-bold" href="#">
-        <FaSeedling size={30} className="highlight mb-3" />
-       EcoTrackify
-     </a>
+                <Nav.Link as={Link} to="/dashboard" className="d-flex align-items-center gap-2">
+                  <FaChartLine /> Dashboard
+                </Nav.Link>
+                <Nav.Link as={Link} to="/carbon-footprint" className="d-flex align-items-center gap-2">
+                  <FaLeaf /> Carbon Tracker
+                </Nav.Link>
+                <Nav.Link as={Link} to="/community" className="d-flex align-items-center gap-2">
+                  <FaUsers /> Community
+                </Nav.Link>
+              </>
+            ) : (
+              <>
+                {/* Not logged in → only About, but make it feel centered */}
+                <Nav.Link as={Link} to="/" className="d-flex align-items-center gap-2">
+                  <FaInfoCircle /> About
+                </Nav.Link>
+              </>
+            )}
+          </Nav>
 
-     {/* Collapse toggle for mobile */}
+          {/* Right side */}
+          <Nav className="ms-auto">
+            {currentUser ? (
+              <>
+                <Dropdown align="end">
+                  <Dropdown.Toggle
+                    as="button"
+                    className="btn btn-link nav-link d-flex align-items-center text-decoration-none"
+                    style={{ border: "none", background: "none" }}
+                  >
+                    <FaUserCircle className="me-2" />
+                    <span className="d-none d-md-inline">
+                      {currentUser?.name || currentUser?.organization}
+                    </span>
+                  </Dropdown.Toggle>
 
-     <button
-
-       className="navbar-toggler"
-
-       type="button"
-
-       data-bs-toggle="collapse"
-
-       data-bs-target="#navbarNav"
-
-       aria-controls="navbarNav"
-
-       aria-expanded="false"
-
-       aria-label="Toggle navigation"
-
-     >
-
-       <span className="navbar-toggler-icon"></span>
-
-     </button>
-
-     {/* Navbar links */}
-
-     <div className="collapse navbar-collapse" id="navbarNav">
-
-       <div className="ms-auto d-flex gap-3 align-items-center">
-
-         <a className="nav-link p-2 d-flex align-items-center gap-1" href="/">
-
-           <FaHome /> Home
-
-         </a>
-
-         <a className="nav-link p-2 d-flex align-items-center gap-1" href="/dashboard">
-
-           <FaChartLine /> Dashboard
-
-         </a>
-
-         <a className="nav-link p-2 d-flex align-items-center gap-1" href="/community">
-
-           <FaUsers /> Community
-
-         </a>
-
-         <a className="nav-link p-2 d-flex align-items-center gap-1" href="/signin">
-
-           <FaSignInAlt /> Sign In
-
-         </a>
-
-         <a className="nav-link p-2 d-flex align-items-center gap-1" href="/signup">
-
-           <FaUserPlus /> Sign Up
-
-         </a>
-
-       </div>
-
-     </div>
-
-   </nav>
-
- );
-
+                  <Dropdown.Menu>
+                    <Dropdown.Header>
+                      Signed in as <strong>{formatUserType(userType)}</strong>
+                    </Dropdown.Header>
+                    <Dropdown.Divider />
+                    <Dropdown.Item as={Link} to="/profile" className="d-flex align-items-center gap-2">
+                      <FaUserCircle /> Manage Profile
+                    </Dropdown.Item>
+ 
+                    <Dropdown.Divider />
+                    <Dropdown.Item onClick={handleLogout} className="d-flex align-items-center gap-2">
+                      <FaSignOutAlt /> Logout
+                    </Dropdown.Item>
+                  </Dropdown.Menu>
+                </Dropdown>
+              </>
+            ) : (
+              <>
+                <Nav.Link as={Link} to="/signin" className="d-flex align-items-center gap-2">
+                  <FaSignInAlt /> Sign In
+                </Nav.Link>
+                <Link
+                  to="/signup"
+                  className="btn btn-success btn-signup d-flex align-items-center gap-2 ms-2"
+                  style={{ padding: "0.5rem 1rem" }}
+                >
+                  <FaUserPlus /> Sign Up
+                </Link>
+              </>
+            )}
+          </Nav>
+        </Navbar.Collapse>
+      </Container>
+    </Navbar>
+  );
 };
 
-export default Navbar;
+export default NavBar;

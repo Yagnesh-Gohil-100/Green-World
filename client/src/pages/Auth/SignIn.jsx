@@ -470,6 +470,8 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { FaUser, FaBuilding } from "react-icons/fa";
+import { useAuth } from '../../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import "./login.css";
 
 const SignIn = () => {
@@ -482,30 +484,26 @@ const SignIn = () => {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const validate = () => {
     let tempErrors = {};
-
-    // Business role validation
     if (activeTab === "business" && !role) {
       tempErrors.role = "Please select your role";
     }
-
-    // Email validation
     if (!formData.email) {
       tempErrors.email = "Email is required";
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       tempErrors.email = "Invalid email format";
     }
-
-    // Password validation
     if (!formData.password) {
       tempErrors.password = "Password is required";
     }
-
     setErrors(tempErrors);
     return Object.keys(tempErrors).length === 0;
   };
@@ -513,13 +511,10 @@ const SignIn = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
-
     setLoading(true);
 
     try {
       const url = "http://localhost:5000/api/auth/login";
-      
-      // Determine userType based on activeTab and role
       let userType;
       if (activeTab === "personal") {
         userType = "personal";
@@ -527,40 +522,26 @@ const SignIn = () => {
         userType = role === "admin" ? "business" : "employee";
       }
 
-      const loginData = {
+      const response = await axios.post(url, {
         email: formData.email,
         password: formData.password,
         userType: userType
-      };
+      });
 
-      const response = await axios.post(url, loginData);
-      
       if (response.data.success) {
-        alert("Login successful!");
-        // Save token and user type to localStorage
-        localStorage.setItem("token", response.data.token);
-        localStorage.setItem("userType", response.data.userType);
-        
-        // Redirect based on user type
-        if (response.data.userType === "personal") {
-          window.location.href = "/dashboard/personal";
-        } else if (response.data.userType === "business") {
-          window.location.href = "/dashboard/business";
-        } else if (response.data.userType === "employee") {
-          window.location.href = "/dashboard/employee";
-        }
-      } else {
-        alert(`Login failed: ${response.data.error}`);
-      }
+        login(response.data.token, response.data.data, response.data.userType);
 
-    } catch (err) {
-      console.error("Login error:", err);
-      
-      if (err.response && err.response.data) {
-        alert(`Login failed: ${err.response.data.error}`);
-      } else {
-        alert("Login failed! Please try again.");
+        // Redirect to appropriate dashboard based on user type
+        if (userType === "personal") {
+          navigate('/dashboard/personal');
+        } else if (userType === "business") {
+          navigate('/dashboard/business');
+        } else if (userType === "employee") {
+          navigate('/dashboard/employee');
+        }
       }
+    } catch (err) {
+      // error handling
     } finally {
       setLoading(false);
     }
@@ -571,7 +552,7 @@ const SignIn = () => {
       <div className="signin-card">
         <h2 className="signin-title">Welcome Back</h2>
         <p className="signin-subtitle">Sign in to continue your eco-journey</p>
-        
+
         {/* Tabs */}
         <div className="tab-container">
           <button
@@ -616,7 +597,7 @@ const SignIn = () => {
           </div>
         )}
 
-        
+
 
         {/* Form */}
         <form onSubmit={handleSubmit} noValidate>
@@ -658,9 +639,9 @@ const SignIn = () => {
           </div>
 
           {/* Submit Button */}
-          <button 
-            type="submit" 
-            className="submit-btn" 
+          <button
+            type="submit"
+            className="submit-btn"
             disabled={loading || (activeTab === "business" && !role)}
           >
             {loading ? "Signing In..." : "Sign In →"}

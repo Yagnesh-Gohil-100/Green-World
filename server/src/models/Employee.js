@@ -40,6 +40,17 @@ const employeeSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  settings: {
+    notifications: {
+      type: Boolean,
+      default: true
+    },
+    theme: {
+      type: String,
+      enum: ['light', 'dark'],
+      default: 'light'
+    }
+  },
   verificationToken: String,
   resetPasswordToken: String,
   resetPasswordExpire: Date,

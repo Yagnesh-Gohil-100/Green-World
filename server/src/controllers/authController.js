@@ -357,40 +357,44 @@ exports.logout = async (req, res, next) => {
   }
 };
 
-// Verify email
+// Verify email and return security question
 exports.verifyEmail = async (req, res, next) => {
   try {
-    const { token } = req.params;
+    const { email } = req.body;
 
-    // Check all models for the token
-    let user = await PersonalUser.findOne({ verificationToken: token });
-    let userType = 'personal';
-    
-    if (!user) {
-      user = await Business.findOne({ verificationToken: token });
-      userType = 'business';
-    }
-    
-    if (!user) {
-      user = await Employee.findOne({ verificationToken: token });
-      userType = 'employee';
-    }
-
-    if (!user) {
+    if (!email) {
       return res.status(400).json({
         success: false,
-        error: 'Invalid or expired verification token'
+        error: 'Email is required'
       });
     }
 
-    user.isVerified = true;
-    user.verificationToken = undefined;
-    await user.save();
+    // Check all user models
+    let user = await PersonalUser.findOne({ email });
+    let userModel = 'PersonalUser';
+    
+    if (!user) {
+      user = await Business.findOne({ email });
+      userModel = 'Business';
+    }
+    
+    if (!user) {
+      user = await Employee.findOne({ email });
+      userModel = 'Employee';
+    }
 
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        error: 'No account found with this email'
+      });
+    }
+
+    // For simplicity, using a fixed security question
+    // In real app, you'd store this in user model
     res.status(200).json({
       success: true,
-      message: 'Email verified successfully',
-      userType
+      securityQuestion: "What is your mother's maiden name?"
     });
 
   } catch (error) {
@@ -398,6 +402,91 @@ exports.verifyEmail = async (req, res, next) => {
     res.status(500).json({
       success: false,
       error: 'Server error during email verification'
+    });
+  }
+};
+
+// Verify security answer
+exports.verifySecurityAnswer = async (req, res, next) => {
+  try {
+    const { email, securityAnswer } = req.body;
+
+    if (!email || !securityAnswer) {
+      return res.status(400).json({
+        success: false,
+        error: 'Email and security answer are required'
+      });
+    }
+
+    // For simplicity, using a fixed answer
+    // In real app, you'd verify against stored answer
+    const correctAnswer = "MERN"; // Example answer
+
+    if (securityAnswer.toLowerCase() !== correctAnswer.toLowerCase()) {
+      return res.status(400).json({
+        success: false,
+        error: 'Incorrect security answer'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Security answer verified'
+    });
+
+  } catch (error) {
+    console.error('Security answer verification error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Server error during security verification'
+    });
+  }
+};
+
+// Reset password
+exports.resetPassword = async (req, res, next) => {
+  try {
+    const { email, newPassword } = req.body;
+
+    if (!email || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        error: 'Email and new password are required'
+      });
+    }
+
+    // Find user in all models
+    let user = await PersonalUser.findOne({ email });
+    
+    if (!user) {
+      user = await Business.findOne({ email });
+    }
+    
+    if (!user) {
+      user = await Employee.findOne({ email });
+    }
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        error: 'No account found with this email'
+      });
+    }
+
+    // Update password
+    user.password = newPassword;
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Password reset successfully'
+    });
+
+  } catch (error) {
+    console.error('Password reset error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Server error during password reset'
     });
   }
 };
