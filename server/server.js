@@ -7,6 +7,7 @@ require('dotenv').config();
 // Import routes
 const authRoutes = require('./src/routes/auth');
 const userRoutes = require('./src/routes/users')
+const communityRoutes = require('./src/routes/community')
 
 // Import database connection
 const connectDB = require('./src/config/database');
@@ -46,7 +47,8 @@ app.get('/api/health', (req, res) => {
 
 // API routes
 app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes)
+app.use('/api/users', userRoutes);
+app.use('/api/community', communityRoutes);
 
 // 404 handler for API routes - FIXED THIS PART
 app.use('/api/:any', (req, res) => {

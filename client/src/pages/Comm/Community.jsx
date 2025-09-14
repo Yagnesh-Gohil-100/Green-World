@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { FaLeaf, FaPlus, FaSearch } from "react-icons/fa";
+import { FaLeaf, FaPlus, FaSearch, FaSync } from "react-icons/fa";
 import { useAuth } from '../../contexts/AuthContext';
 
 import Form from "../../components/community/Form";
-import CategoryFilter from '../../components/community/CategoryFilter'
+import CategoryFilter from '../../components/community/CategoryFilter';
 import Tipscards from "../../components/community/Tipscards";
 import "./Community.css";
 
@@ -17,101 +17,156 @@ const Community = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // ---------- Fetch tips from backend ----------
-  useEffect(() => {
-    const fetchTips = async () => {
-      try {
-        setLoading(true);
-        let url = "http://localhost:5000/api/community/tips";
-        const params = {};
-        
-        if (activeCategory !== "All Tips") params.category = activeCategory;
-        if (query.trim()) params.search = query;
-
-        const res = await axios.get(url, { params });
-        setTips(res.data.tips || res.data);
-        setError("");
-      } catch (err) {
-        console.error("Error fetching tips:", err.message);
-        setError("Failed to load community tips");
-      } finally {
-        setLoading(false);
+  // Get axios instance with auth headers
+  const getAuthAxios = () => {
+    const token = localStorage.getItem('token');
+    return axios.create({
+      baseURL: 'http://localhost:5000/api',
+      headers: {
+        Authorization: `Bearer ${token}`
       }
-    };
+    });
+  };
 
+  // ---------- Fetch tips from backend ----------
+  const fetchTips = async () => {
+    try {
+      setLoading(true);
+      const authAxios = getAuthAxios();
+      const url = "/community/tips";
+      const params = {};
+      
+      if (activeCategory !== "All Tips") params.category = activeCategory;
+      if (query.trim()) params.search = query;
+
+      const res = await authAxios.get(url, { params });
+      // Updated to use res.data.data instead of res.data.tips
+      setTips(res.data.data || []);
+      setError("");
+    } catch (err) {
+      console.error("Error fetching tips:", err);
+      setError("Failed to load community tips");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchTips();
   }, [activeCategory, query]);
 
   // ---------- Actions ----------
   const handleLike = async (id) => {
+    if (!currentUser) {
+      alert("Please sign in to like tips");
+      return;
+    }
+
     try {
-      const res = await axios.put(`http://localhost:5000/api/community/tips/${id}/like`);
-      setTips((list) => list.map((t) => (t._id === id ? res.data.tip : t)));
+      const authAxios = getAuthAxios();
+      const res = await authAxios.put(`/community/tips/${id}/like`);
+      // Updated to use res.data.data instead of res.data.tip
+      setTips((list) => list.map((t) => (t._id === id ? res.data.data : t)));
     } catch (err) {
-      console.error("Error liking tip:", err.message);
-      alert("Failed to like tip");
+      console.error("Error liking tip:", err);
+      alert(err.response?.data?.error || "Failed to like tip");
     }
   };
 
   const handleDislike = async (id) => {
+    if (!currentUser) {
+      alert("Please sign in to dislike tips");
+      return;
+    }
+
     try {
-      const res = await axios.put(`http://localhost:5000/api/community/tips/${id}/dislike`);
-      setTips((list) => list.map((t) => (t._id === id ? res.data.tip : t)));
+      const authAxios = getAuthAxios();
+      const res = await authAxios.put(`/community/tips/${id}/dislike`);
+      // Updated to use res.data.data instead of res.data.tip
+      setTips((list) => list.map((t) => (t._id === id ? res.data.data : t)));
     } catch (err) {
-      console.error("Error disliking tip:", err.message);
-      alert("Failed to dislike tip");
+      console.error("Error disliking tip:", err);
+      alert(err.response?.data?.error || "Failed to dislike tip");
     }
   };
 
   const handleRate = async (id, value) => {
+    if (!currentUser) {
+      alert("Please sign in to rate tips");
+      return;
+    }
+
     try {
-      const res = await axios.put(`http://localhost:5000/api/community/tips/${id}/rating`, {
-        value,
-      });
-      setTips((list) => list.map((t) => (t._id === id ? res.data.tip : t)));
+      const authAxios = getAuthAxios();
+      const res = await authAxios.put(`/community/tips/${id}/rating`, { value });
+      // Updated to use res.data.data instead of res.data.tip
+      setTips((list) => list.map((t) => (t._id === id ? res.data.data : t)));
     } catch (err) {
-      console.error("Error rating tip:", err.message);
-      alert("Failed to rate tip");
+      console.error("Error rating tip:", err);
+      alert(err.response?.data?.error || "Failed to rate tip");
     }
   };
 
   const handleAddComment = async (id, text) => {
+    if (!currentUser) {
+      alert("Please sign in to add comments");
+      return;
+    }
+
     try {
-      const res = await axios.post(`http://localhost:5000/api/community/tips/${id}/comments`, {
-        text,
-      });
-      setTips((list) => list.map((t) => (t._id === id ? res.data.tip : t)));
+      const authAxios = getAuthAxios();
+      const res = await authAxios.post(`/community/tips/${id}/comments`, { text });
+      // Updated to use res.data.data instead of res.data.tip
+      setTips((list) => list.map((t) => (t._id === id ? res.data.data : t)));
     } catch (err) {
-      console.error("Error adding comment:", err.message);
-      alert("Failed to add comment");
+      console.error("Error adding comment:", err);
+      alert(err.response?.data?.error || "Failed to add comment");
     }
   };
 
   const handleDelete = async (id) => {
+    if (!currentUser) {
+      alert("Please sign in to delete tips");
+      return;
+    }
+
     if (!window.confirm("Are you sure you want to delete this tip?")) return;
     
     try {
-      await axios.delete(`http://localhost:5000/api/community/tips/${id}`);
+      const authAxios = getAuthAxios();
+      await authAxios.delete(`/community/tips/${id}`);
       setTips((list) => list.filter((t) => t._id !== id));
     } catch (err) {
-      console.error("Error deleting tip:", err.message);
-      alert("Failed to delete tip");
+      console.error("Error deleting tip:", err);
+      alert(err.response?.data?.error || "Failed to delete tip");
     }
   };
 
   const handleSubmitTip = async (newTip) => {
+    if (!currentUser) {
+      alert("Please sign in to submit tips");
+      return;
+    }
+
     try {
-      const res = await axios.post("http://localhost:5000/api/community/tips", newTip);
-      setTips((list) => [res.data.tip, ...list]);
+      const authAxios = getAuthAxios();
+      const res = await authAxios.post("/community/tips", newTip);
+      // Updated to use res.data.data instead of res.data.tip
+      setTips((list) => [res.data.data, ...list]);
       setShowAdd(false);
     } catch (err) {
-      console.error("Error submitting tip:", err.message);
-      alert("Failed to submit tip");
+      console.error("Error submitting tip:", err);
+      alert(err.response?.data?.error || "Failed to submit tip");
     }
   };
 
+  // Refresh tips
+  const handleRefresh = () => {
+    fetchTips();
+  };
+
   // ---------- UI ----------
-  const categories = ["All Tips", "Energy", "Transport", "Home & Garden", "Food", "Shopping", "General"];
+  const categories = ["All Tips", "Energy", "Transport", "Home & Garden", "General"];
 
   if (loading) {
     return (
@@ -132,6 +187,13 @@ const Community = () => {
         <div className="d-flex align-items-center gap-2 mb-2">
           <FaLeaf className="highlight" />
           <h2 className="page-title">Eco Community</h2>
+          <button 
+            className="btn btn-outline-success btn-sm ms-2"
+            onClick={handleRefresh}
+            title="Refresh tips"
+          >
+            <FaSync />
+          </button>
         </div>
         
         <p className="page-subtitle">

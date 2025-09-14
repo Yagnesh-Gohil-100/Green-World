@@ -10,7 +10,7 @@ import {
   FaStar,
   FaRegStar,
 } from "react-icons/fa";
-import "../../pages/Comm/Community.css";
+import '../../pages/Comm/Community.css';
 import { formatTimeAgo } from '../../utils/timeUtils';
 
 const Stars = ({ value = 0, onChange, readonly = false }) => {
