@@ -146,7 +146,7 @@
   overflow: hidden; 
 }
 
-.progress-bar { 
+.progress-bar-personal { 
   height: 100%; 
   transition: width 0.5s ease;
 }

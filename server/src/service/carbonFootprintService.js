@@ -62,10 +62,55 @@ const deleteCarbonFootprint = async (entryId, userId) => {
   });
 };
 
+const updateSustainabilityScore = async (userId, newEntry) => {
+  const TRANSPORT_FACTOR = 0.21;
+  const ENERGY_FACTOR = 0.475;
+  const WASTE_FACTOR = 0.7;
+
+  const footprint = 
+    (newEntry.transport * TRANSPORT_FACTOR) +
+    (newEntry.energy * ENERGY_FACTOR) +
+    (newEntry.waste * WASTE_FACTOR);
+
+  // Get employee's goals
+  const goals = await Goal.findOne({ userId, userType: 'Employee' });
+  
+  let scoreIncrease = 0;
+  
+  if (goals) {
+    // Calculate achievement based on goals
+    if (newEntry.transport <= goals.transport) scoreIncrease += 5;
+    if (newEntry.energy <= goals.energy) scoreIncrease += 5;
+    if (newEntry.waste <= goals.waste) scoreIncrease += 5;
+  }
+
+  // Update employee's sustainability score
+  await Employee.findByIdAndUpdate(userId, {
+    $inc: {
+      'profile.sustainabilityScore': scoreIncrease,
+      'profile.goalsCompleted': scoreIncrease > 0 ? 1 : 0
+    },
+    $set: {
+      'profile.lastActivity': new Date(),
+      'profile.carbonFootprint': footprint
+    },
+    $push: scoreIncrease > 0 ? {
+      'profile.achievements': {
+        name: 'Daily Goal Achievement',
+        points: scoreIncrease,
+        earnedAt: new Date()
+      }
+    } : undefined
+  });
+
+  return scoreIncrease;
+};
+
 module.exports = {
   createCarbonFootprint,
   getUserCarbonFootprints,
   getLatestCarbonFootprint,
   getCarbonSummary,
-  deleteCarbonFootprint
+  deleteCarbonFootprint,
+  updateSustainabilityScore
 };

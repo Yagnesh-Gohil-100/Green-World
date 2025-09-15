@@ -61,12 +61,23 @@ const employeeSchema = new mongoose.Schema({
     },
     sustainabilityScore: {
       type: Number,
-      default: 0
+      default: 0,
+      min: 0,
+      max: 100
     },
     goalsCompleted: {
       type: Number,
       default: 0
-    }
+    },
+    achievements: [{
+      name: String,
+      points: Number,
+      earnedAt: {
+        type: Date,
+        default: Date.now
+      }
+    }],
+    lastActivity: Date
   }
 }, {
   timestamps: true

@@ -265,7 +265,7 @@ const PersonalDashboard = () => {
                                         <p><FaBusAlt /> Transport: {latest.transport} km</p>
                                         <div className="progress">
                                             <div
-                                                className="progress-bar bg-eco"
+                                                className="progress-bar-personal bg-eco"
                                                 style={{ width: `${(latest.transport / sum) * 100}%` }}
                                             ></div>
                                         </div>
@@ -274,7 +274,7 @@ const PersonalDashboard = () => {
                                         <p><MdOutlineBolt /> Energy: {latest.energy} kWh</p>
                                         <div className="progress">
                                             <div
-                                                className="progress-bar bg-eco"
+                                                className="progress-bar-personal bg-eco"
                                                 style={{ width: `${(latest.energy / sum) * 100}%` }}
                                             ></div>
                                         </div>
@@ -283,7 +283,7 @@ const PersonalDashboard = () => {
                                         <p><FaRecycle /> Waste: {latest.waste} kg</p>
                                         <div className="progress">
                                             <div
-                                                className="progress-bar bg-eco"
+                                                className="progress-bar-personal bg-eco"
                                                 style={{ width: `${(latest.waste / sum) * 100}%` }}
                                             ></div>
                                         </div>
@@ -316,7 +316,7 @@ const PersonalDashboard = () => {
                                     </p>
                                     <div className="progress">
                                         <div
-                                            className={`progress-bar ${latest[type] > goals[type] ? "bg-danger" : "bg-eco"
+                                            className={`progress-bar-personal ${latest[type] > goals[type] ? "bg-danger" : "bg-eco"
                                                 }`}
                                             style={{
                                                 width: `${Math.min((latest[type] / goals[type]) * 100, 100)}%`

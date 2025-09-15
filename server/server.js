@@ -10,6 +10,7 @@ const userRoutes = require('./src/routes/users')
 const communityRoutes = require('./src/routes/community')
 const goalRoutes = require('./src/routes/goalRoutes');
 const carbonFootprintRoutes = require('./src/routes/carbonFootprintRoutes');
+const businessRoutes = require('./src/routes/businessRoutes');
 
 // Import database connection
 const connectDB = require('./src/config/database');
@@ -53,6 +54,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/community', communityRoutes);
 app.use('/api/goals', goalRoutes);
 app.use('/api/carbon-footprint', carbonFootprintRoutes);
+app.use('/api/business', businessRoutes);
 
 // 404 handler for API routes - FIXED THIS PART
 app.use('/api/:any', (req, res) => {
