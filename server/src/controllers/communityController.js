@@ -26,7 +26,7 @@ exports.createTip = async (req, res) => {
     const tipData = {
       ...req.body,
       authorId: req.user.id,
-      authorName: req.user.name || req.user.businessName
+      authorName: req.user.name || req.user.organization
     };
 
     const tip = await communityService.createTip(tipData);

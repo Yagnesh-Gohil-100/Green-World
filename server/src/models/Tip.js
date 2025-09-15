@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const ratingSchema = new mongoose.Schema({
   userId: { 
     type: mongoose.Schema.Types.ObjectId, 
-    ref: 'User', 
+    // ref: 'User', 
     required: true 
   },
   value: { 
@@ -55,7 +55,7 @@ const tipSchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    enum: ["General", "Energy", "Transport", "Home & Garden", "Food", "Shopping", "Waste Reduction"],
+    enum: ["General", "Energy", "Transport", "Home & Garden", "Waste Reduction"],
     required: true,
   },
   authorId: { 

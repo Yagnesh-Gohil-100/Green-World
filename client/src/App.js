@@ -18,6 +18,7 @@ import ForgotPassword from './pages/Auth/ForgotPassword'
 import Profile from './pages/Profile/Profile'
 import Settings from './pages/Profile/Settings'
 
+import CarbonFootprintForm from './components/forms/CarbonFootprintForm';
 import Community from "./pages/Comm/Community";
 
 import "./App.css";
@@ -142,6 +143,15 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Community />
+                </ProtectedRoute>
+              } 
+            />
+
+            <Route 
+              path="/carbon-footprint" 
+              element={
+                <ProtectedRoute>
+                  <CarbonFootprintForm  />
                 </ProtectedRoute>
               } 
             />
